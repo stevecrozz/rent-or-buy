@@ -7,6 +7,32 @@ var round = require('./dollar-round');
  */
 var Month = function(options) {
   this.opts = options;
+  this.cache = {};
+
+  this.cacheIt('homeValue');
+  this.cacheIt('equity');
+  this.cacheIt('rentPayment');
+  this.cacheIt('mortgageInterestDeductionValue');
+  this.cacheIt('buyCost');
+  this.cacheIt('opportunityCostVsInvestment');
+  this.cacheIt('rentCost');
+  this.cacheIt('totalCashUsedToBuy');
+  this.cacheIt('totalCashUsedToRent');
+};
+
+Month.prototype.cacheIt = function(name) {
+  var originalFn = this[name];
+
+  var wrapper = function(){
+    if (this.cache[name]) {
+      return this.cache[name];
+    }
+
+    this.cache[name] = originalFn.call(this);
+    return this.cache[name];
+  }
+
+  this[name] = wrapper;
 };
 
 Month.prototype.homeValue = function() {
@@ -35,7 +61,8 @@ Month.prototype.equity = function() {
 }
 
 Month.prototype.rentPayment = function() {
-  if (this.opts.lastMonth.rentPayment() === 0) return this.opts.initialRent;
+  if (this.opts.lastMonth.rentPayment() === 0)
+    return this.opts.initialRent;
 
   multiplier = 1 + (this.opts.annualRentIncreaseRate / 11.0);
   return round(this.opts.lastMonth.rentPayment() * multiplier);
@@ -47,12 +74,15 @@ Month.prototype.mortgageInterestDeductionValue = function() {
 }
 
 Month.prototype.buyCost = function() {
+  var homeValueIncrease = this.homeValue() - this.opts.lastMonth.homeValue();
+
   var costBeforeOpportunityCost = round(
     this.opts.mortgage.interestPayment +
     this.repairsExpense() +
     this.insuranceExpense() +
     this.propertyTaxExpense() -
-    this.mortgageInterestDeductionValue()
+    this.mortgageInterestDeductionValue() -
+    homeValueIncrease
   );
 
   var cashBuy = this.opts.lastMonth.totalCashUsedToBuy() + costBeforeOpportunityCost;
@@ -69,7 +99,8 @@ Month.prototype.opportunityCostVsInvestment = function(){
   var cashDifference = this.totalCashUsedToBuy() - this.totalCashUsedToRent();
   var monthlyReturn = this.opts.annualInvestmentReturnRate / 12;
   var interest = round(cashDifference * monthlyReturn);
-  return interestAfterTaxes = interest * (1 - this.opts.totalInvestmentTaxRate);
+  var interestAfterTaxes = interest * (1 - this.opts.totalInvestmentTaxRate);
+  return interestAfterTaxes;
 }
 
 Month.prototype.rentCost = function(){
@@ -77,10 +108,7 @@ Month.prototype.rentCost = function(){
 }
 
 Month.prototype.totalCashUsedToBuy = function() {
-  return round(
-    this.opts.lastMonth.totalCashUsedToBuy() +
-    this.buyCost()
-  );
+  return round(this.opts.lastMonth.totalCashUsedToBuy() + this.buyCost());
 }
 
 Month.prototype.totalCashUsedToRent = function() {
