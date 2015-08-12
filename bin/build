@@ -1,0 +1,7 @@
+#!/bin/sh
+
+mkdir -p dist
+
+./node_modules/.bin/babel src/rent-or-buy/index.js \
+  | cat | ./node_modules/.bin/browserify \
+  > dist/rent-or-buy.js
