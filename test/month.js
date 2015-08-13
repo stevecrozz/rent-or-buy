@@ -119,8 +119,8 @@ describe('Month', function() {
       assert.equal(month1.mortgageInterestDeductionValue(), 266.40);
     });
 
-    it('cost to buy is $1,445.85', function(){
-      assert.equal(month1.buyCost(), 1445.85);
+    it('cost to buy is $692.58', function(){
+      assert.equal(month1.buyCost(), 692.58);
     });
 
     it('cost to rent is $1,000', function(){
@@ -128,7 +128,7 @@ describe('Month', function() {
     });
 
     it('total cash used to buy is $61,445.85', function(){
-      assert.equal(month1.totalCashUsedToBuy(), 61445.85);
+      assert.equal(month1.totalCashUsedToBuy(), 60692.58);
     });
 
     it('total cash used to rent is $1,000', function(){
@@ -169,16 +169,16 @@ describe('Month', function() {
       assert.equal(month2.mortgageInterestDeductionValue(), 266.02);
     });
 
-    it('cost to buy is $1,448.64', function(){
-      assert.equal(month2.buyCost(), 1448.64);
+    it('cost to buy is $690.21', function(){
+      assert.equal(month2.buyCost(), 690.21);
     });
 
     it('cost to rent is $1,002.73', function(){
       assert.equal(month2.rentCost(), 1002.73);
     });
 
-    it('total cash used to buy is $62,894.49', function(){
-      assert.equal(month2.totalCashUsedToBuy(), 62894.49);
+    it('total cash used to buy is $61,382.79', function(){
+      assert.equal(month2.totalCashUsedToBuy(), 61382.79);
     });
 
     it('total cash used to rent is $2,002.73', function(){
